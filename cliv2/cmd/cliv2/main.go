@@ -59,6 +59,7 @@ import (
 	snykmcp "github.com/snyk/snyk-ls/mcp_extension"
 
 	cli_errors "github.com/snyk/cli/cliv2/internal/errors"
+	cliv2utils "github.com/snyk/cli/cliv2/internal/utils"
 	"github.com/snyk/cli/cliv2/pkg/basic_workflows"
 )
 
@@ -529,7 +530,13 @@ func MainWithErrorCode() (int, []error) {
 	rInfo := runtimeinfo.New(runtimeinfo.WithName("snyk-cli"), runtimeinfo.WithVersion(cliv2.GetFullVersion()))
 
 	rootCommand := prepareRootCommand()
-	_ = rootCommand.ParseFlags(os.Args)
+	_ = rootCommand.ParseFlags(os.Args[1:])
+
+	// catpure CLI arguments
+	allArgs := cliv2utils.CaptureAllArgs(os.Args[1:])
+	// print allArgs as json
+	allArgsJSON, _ := json.MarshalIndent(allArgs, "", "  ")
+	fmt.Println(string(allArgsJSON))
 
 	// create engine
 	globalConfiguration = configuration.NewWithOpts(
